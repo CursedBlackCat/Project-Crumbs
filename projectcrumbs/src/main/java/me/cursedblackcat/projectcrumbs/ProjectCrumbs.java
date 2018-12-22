@@ -38,14 +38,14 @@ import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.user.User;
 
-public class ProjectCrumbs extends Application {	
+public class ProjectCrumbs extends Application {
 	DiscordApi api;
 	TextChannel lastActiveChannel;
-	
+
 	ArrayList<StickerPack> stickerPacks = new ArrayList<StickerPack>();
-	
+
 	StickerPack activePack;
-	
+
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
 	public static void main(String[] args){
@@ -110,20 +110,20 @@ public class ProjectCrumbs extends Application {
 
 		return new Scene(grid, 300, 275);
 	}
-	
-	private Scene stickerScene() {
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.TOP_LEFT);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-		
+
+	private Scene stickerScene(Stage stage) {
+		GridPane stickerSceneGrid = new GridPane();
+		stickerSceneGrid.setAlignment(Pos.TOP_LEFT);
+		stickerSceneGrid.setHgap(10);
+		stickerSceneGrid.setVgap(10);
+		stickerSceneGrid.setPadding(new Insets(5, 5, 5, 5));
+
 		//Make the top bar a sticker selector
 		HBox stickerPackSelector = new HBox();
 		stickerPackSelector.setMaxHeight(50);
-		
+
 		ArrayList<Button> stickerPackButtons = new ArrayList<Button>();
-		
+
 		for (StickerPack s : stickerPacks) {
 			Button btn = new Button();
 			btn.setMinSize(50, 50);
@@ -131,19 +131,27 @@ public class ProjectCrumbs extends Application {
 			ImageView v = new ImageView(s.getIcon());
 			v.setFitHeight(50);
 			v.setFitWidth(50);
-			
+
+			btn.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					activePack = stickerPacks.get(stickerPackButtons.indexOf(btn));
+					stage.setScene(stickerScene(stage));
+				}
+			});
+
 			BackgroundImage bImage = new BackgroundImage(s.getIcon(), BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(btn.getWidth(), btn.getHeight(), true, true, true, false));
 
-		    Background backGround = new Background(bImage);
-		    btn.setBackground(backGround);
-			
+			Background backGround = new Background(bImage);
+			btn.setBackground(backGround);
+
 			btn.setGraphic(v);
 			stickerPackButtons.add(btn);
 			stickerPackSelector.getChildren().add(btn);
 		}
-		
-		grid.add(stickerPackSelector, 0, 0, 10, 1); //span 10 columns
-		
+
+		stickerSceneGrid.add(stickerPackSelector, 0, 0, 10, 1); //span 10 columns
+
 		//Make a grid of sticker icons, 100x100px each, for the currently active pack
 		int row = 1;
 		int column = 0;
@@ -154,45 +162,45 @@ public class ProjectCrumbs extends Application {
 			ImageView v = new ImageView (i);
 			v.setFitHeight(100);
 			v.setFitWidth(100);
-			
+
 			BackgroundImage bImage = new BackgroundImage(i, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(btn.getWidth(), btn.getHeight(), true, true, true, false));
 
-		    Background backGround = new Background(bImage);
-		    btn.setBackground(backGround);
-		    
-		    btn.setGraphic(v);
-		    
-		    grid.add(btn, column, row);
-		    column++;
-		    if (column > 9) {
-		    	row++;
-		    	column = 0;
-		    }
+			Background backGround = new Background(bImage);
+			btn.setBackground(backGround);
+
+			btn.setGraphic(v);
+
+			stickerSceneGrid.add(btn, column, row);
+			column++;
+			if (column > 9) {
+				row++;
+				column = 0;
+			}
 		}
-		
-		return new Scene(grid, 1100, 500);
+
+		return new Scene(stickerSceneGrid, 1100, 500);
 	}
-	
+
 	private void loadStickerPacks() {
-	    try {
+		try {
 			File jarDirectory = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
 			System.out.println("Current directory: " + jarDirectory.getPath());
 			File stickerDirectory = new File(jarDirectory.getPath() + "\\stickers");
 			stickerDirectory.mkdirs();
 			File[] packDirectories = stickerDirectory.listFiles(File::isDirectory);
-			
+
 			for (File f : packDirectories) {
 				ArrayList<Image> stickers = new ArrayList<Image>();
-				
+
 				for (File i : f.listFiles(File::isFile)) {
 					stickers.add(new Image(i.toURI().toString()));
 				}
-				
+
 				Image icon = stickers.get(0);
 				System.out.println("Sticker pack detected: " + f.getName() + " with " + stickers.size() + " stickers");
 				stickerPacks.add(new StickerPack(f.getName(),stickers, icon));
 			}
-			
+
 		} catch (URISyntaxException e) {
 			new Alert(AlertType.ERROR, "Error occurred when fetching sticker pack list: URISyntaxException. See console for stack trace.").showAndWait();
 		} catch (NullPointerException e) {
@@ -208,10 +216,10 @@ public class ProjectCrumbs extends Application {
 	public void start(Stage primaryStage) {
 		loadStickerPacks();
 		activePack = stickerPacks.get(0);
-		
+
 		primaryStage.setTitle("Project Crumbs");
 		//TODO set it back to this primaryStage.setScene(loginScreen());
-		primaryStage.setScene(stickerScene());
+		primaryStage.setScene(stickerScene(primaryStage));
 		primaryStage.show();
 	}
 }
