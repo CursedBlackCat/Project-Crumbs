@@ -118,6 +118,7 @@ public class ProjectCrumbs extends Application {
 		grid.setVgap(10);
 		grid.setPadding(new Insets(5, 5, 5, 5));
 		
+		//Make the top bar a sticker selector
 		HBox stickerPackSelector = new HBox();
 		stickerPackSelector.setMaxHeight(50);
 		
@@ -141,9 +142,35 @@ public class ProjectCrumbs extends Application {
 			stickerPackSelector.getChildren().add(btn);
 		}
 		
-		grid.add(stickerPackSelector, 0, 0, 10, 1); //span 10 columns, assuming 100px per sticker and 1000px width
+		grid.add(stickerPackSelector, 0, 0, 10, 1); //span 10 columns
 		
-		return new Scene(grid, 1000, 500);
+		//Make a grid of sticker icons, 100x100px each, for the currently active pack
+		int row = 1;
+		int column = 0;
+		for (Image i : activePack.getStickers()) {
+			Button btn = new Button();
+			btn.setMinSize(100, 100);
+			btn.setMaxSize(100, 100);
+			ImageView v = new ImageView (i);
+			v.setFitHeight(100);
+			v.setFitWidth(100);
+			
+			BackgroundImage bImage = new BackgroundImage(i, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(btn.getWidth(), btn.getHeight(), true, true, true, false));
+
+		    Background backGround = new Background(bImage);
+		    btn.setBackground(backGround);
+		    
+		    btn.setGraphic(v);
+		    
+		    grid.add(btn, column, row);
+		    column++;
+		    if (column > 9) {
+		    	row++;
+		    	column = 0;
+		    }
+		}
+		
+		return new Scene(grid, 1100, 500);
 	}
 	
 	private void loadStickerPacks() {
