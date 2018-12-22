@@ -18,7 +18,7 @@ Relaunch the program after that, and you will then be prompted to login with a D
 5. Open the "Network" tab
 6. Type "/api" (without the quotation marks) into the "Filter" textbox
 7. Click on any of the requests, then on the right, click "Headers"
-8. Look for a request that has "Authorization" under "Request headers". The string after "Authorization" is your token.
+8. Look for a request that has "Authorization" under "Request headers". The string after "Authorization" is your token. Be sure to copy the full token. You might find it easier to click the button that says "HAR" at the far right, then "Save All as HAR", and open the resulting file as a JSON file from which you can copy the Authorization token.
 
 Before continuing, **please be extremely careful with your token.** Anyone with your token will be able to use your Discord account. This program does not steal tokens, and you can look at the code to see for yourself. However, you should always be **extremely careful not to share your token with ANYONE**.
 
