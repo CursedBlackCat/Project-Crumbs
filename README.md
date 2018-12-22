@@ -22,6 +22,6 @@ Relaunch the program after that, and you will then be prompted to login with a D
 
 Before continuing, **please be extremely careful with your token.** Anyone with your token will be able to use your Discord account. This program does not steal tokens, and you can look at the code to see for yourself. However, you should always be **extremely careful not to share your token with ANYONE**.
 
-If you feel safe to continue, copy and paste that token into the program, and the program will sign into discord. **The program may freeze or become unresponsive while logging in; this is normal**. Signing in should normally take no longer than a minute or two.
+If you feel safe to continue, copy and paste that token into the program, and the program will sign into Discord. **The program may freeze or become unresponsive while logging in; this is normal**. Signing in should normally take no longer than a minute or two.
 
 If you've done everything right up until this point, the program should then display a message saying it has signed in, and it will load your stickers packs and display them. You can change sticker packs by clicking on the small icons in the top bar, and you can send a sticker by clicking on a sticker. **By default, the program will send a sticker to the channel in which you last sent a message**.
