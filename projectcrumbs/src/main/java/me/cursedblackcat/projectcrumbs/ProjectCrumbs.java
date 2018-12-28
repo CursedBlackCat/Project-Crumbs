@@ -30,13 +30,13 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.user.User;
 
 public class ProjectCrumbs extends Application {
 	DiscordApi api;
@@ -61,6 +61,7 @@ public class ProjectCrumbs extends Application {
 			try {
 				if (event.getMessageAuthor().asUser().get().equals(api.getYourself())) {
 					lastActiveChannel = event.getChannel();
+					System.out.println("Active channel set to " + event.getChannel().toString());
 				}
 			} catch (NoSuchElementException e) {
 				//do nothing, the author was a webhook
@@ -72,7 +73,7 @@ public class ProjectCrumbs extends Application {
 		return api;
 	}
 
-	private Scene loginScreen() {
+	private Scene loginScreen(Stage stage) {
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
 		grid.setHgap(10);
@@ -101,6 +102,7 @@ public class ProjectCrumbs extends Application {
 				try {
 					api = login(tokenTextField.getText());
 					new Alert(AlertType.INFORMATION, "Successfully logged in as " + api.getYourself().getDiscriminatedName()).showAndWait();
+					stage.setScene(stickerScene(stage));
 				} catch (Exception e) {
 					new Alert(AlertType.ERROR, "Invalid token.").showAndWait();
 					tokenTextField.setText("");
@@ -170,6 +172,13 @@ public class ProjectCrumbs extends Application {
 
 			btn.setGraphic(v);
 
+			btn.setOnAction(new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					lastActiveChannel.sendMessage(activePack.getFile(v.getImage()));
+				}
+			});
+
 			stickerSceneGrid.add(btn, column, row);
 			column++;
 			if (column > 9) {
@@ -198,7 +207,7 @@ public class ProjectCrumbs extends Application {
 
 				Image icon = stickers.get(0);
 				System.out.println("Sticker pack detected: " + f.getName() + " with " + stickers.size() + " stickers");
-				stickerPacks.add(new StickerPack(f.getName(),stickers, icon));
+				stickerPacks.add(new StickerPack(f.getName(),stickers, new ArrayList<File>(Arrays.asList(f.listFiles(File::isFile))), icon));
 			}
 
 		} catch (URISyntaxException e) {
@@ -215,11 +224,16 @@ public class ProjectCrumbs extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		loadStickerPacks();
-		activePack = stickerPacks.get(0);
+		try {
+			activePack = stickerPacks.get(0);
+		} catch (IndexOutOfBoundsException e) {
+			new Alert(AlertType.INFORMATION, "No stickers found. Please add sticker pack subfolders in the stickers folder and ensure that there are no empty sticker packs.").showAndWait();
+			e.printStackTrace();
+			System.exit(0);
+		}
 
-		primaryStage.setTitle("Project Crumbs");
-		//TODO set it back to this primaryStage.setScene(loginScreen());
-		primaryStage.setScene(stickerScene(primaryStage));
+		primaryStage.setTitle("Project Crumbs v1.0.0");
+		primaryStage.setScene(loginScreen(primaryStage));
 		primaryStage.show();
 	}
 }
