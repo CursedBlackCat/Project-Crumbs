@@ -258,9 +258,8 @@ public class ProjectCrumbs extends Application {
 			
 			token = new File(configDirectory.getPath() + "\\token.pcdss");
 			token.createNewFile();
-			
-			File clear = new File(configDirectory.getPath() + "\\clear.png");
-			clearImage = new Image(clear.toURI().toString());
+
+			clearImage = new Image(ProjectCrumbs.class.getResource("clear.png").toURI().toString());
 			
 		} catch (URISyntaxException e) {
 			new Alert(AlertType.ERROR, "Error occurred when loading config: URISyntaxException. See console for stack trace.").showAndWait();
