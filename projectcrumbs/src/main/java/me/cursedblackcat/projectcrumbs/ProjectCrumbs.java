@@ -1,11 +1,13 @@
 package me.cursedblackcat.projectcrumbs;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -27,7 +29,13 @@ import javafx.scene.text.Text;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +55,9 @@ public class ProjectCrumbs extends Application {
 	StickerPack activePack;
 
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	
+	Image clearImage;
+	File token;
 
 	public static void main(String[] args){
 		launch(args);
@@ -95,6 +106,19 @@ public class ProjectCrumbs extends Application {
 		hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
 		hbBtn.getChildren().add(btn);
 		grid.add(hbBtn, 1, 2);
+		
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(token));
+			tokenTextField.setText(reader.readLine());
+		} catch (FileNotFoundException e1) {
+			new Alert(AlertType.WARNING, "Could not find token config file.").showAndWait();
+		} catch (IOException e) {
+			new Alert(AlertType.WARNING, "Could not read token config file.").showAndWait();
+		} catch (Exception e) {
+			new Alert(AlertType.WARNING, "Unknown error occurred while reading token config file.").showAndWait();
+		}
+		
 
 		btn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -102,6 +126,11 @@ public class ProjectCrumbs extends Application {
 				try {
 					api = login(tokenTextField.getText());
 					new Alert(AlertType.INFORMATION, "Successfully logged in as " + api.getYourself().getDiscriminatedName()).showAndWait();
+					
+					BufferedWriter writer = new BufferedWriter(new FileWriter(token));
+					writer.write(tokenTextField.getText());
+					writer.close();
+					
 					stage.setScene(stickerScene(stage));
 				} catch (Exception e) {
 					new Alert(AlertType.ERROR, "Invalid token.").showAndWait();
@@ -165,7 +194,7 @@ public class ProjectCrumbs extends Application {
 			v.setFitHeight(100);
 			v.setFitWidth(100);
 
-			BackgroundImage bImage = new BackgroundImage(i, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(btn.getWidth(), btn.getHeight(), true, true, true, false));
+			BackgroundImage bImage = new BackgroundImage(clearImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(btn.getWidth(), btn.getHeight(), true, true, true, false));
 
 			Background backGround = new Background(bImage);
 			btn.setBackground(backGround);
@@ -193,7 +222,7 @@ public class ProjectCrumbs extends Application {
 	private void loadStickerPacks() {
 		try {
 			File jarDirectory = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
-			System.out.println("Current directory: " + jarDirectory.getPath());
+			//System.out.println("Current directory: " + jarDirectory.getPath());
 			File stickerDirectory = new File(jarDirectory.getPath() + "\\stickers");
 			stickerDirectory.mkdirs();
 			File[] packDirectories = stickerDirectory.listFiles(File::isDirectory);
@@ -220,10 +249,37 @@ public class ProjectCrumbs extends Application {
 			e.printStackTrace();
 		}
 	}
+	
+	private void loadConfig() {
+		try {
+			File jarDirectory = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+			File configDirectory = new File(jarDirectory.getPath() + "\\config");
+			configDirectory.mkdirs();
+			
+			token = new File(configDirectory.getPath() + "\\token.pcdss");
+			token.createNewFile();
+			
+			File clear = new File(configDirectory.getPath() + "\\clear.png");
+			clearImage = new Image(clear.toURI().toString());
+			
+		} catch (URISyntaxException e) {
+			new Alert(AlertType.ERROR, "Error occurred when loading config: URISyntaxException. See console for stack trace.").showAndWait();
+		} catch (NullPointerException e) {
+			new Alert(AlertType.ERROR, "Error occurred when loading config: NullPointerException. See console for stack trace.").showAndWait();
+			e.printStackTrace();
+		} catch (ArrayIndexOutOfBoundsException e) {
+			new Alert(AlertType.ERROR, "Error occurred when loading config: ArrayIndexOutOfBoundsException. See console for stack trace.").showAndWait();
+			e.printStackTrace();
+		} catch (IOException e) {
+			new Alert(AlertType.ERROR, "Error occurred when loading config: IOException. See console for stack trace.").showAndWait();
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public void start(Stage primaryStage) {
 		loadStickerPacks();
+		loadConfig();
 		try {
 			activePack = stickerPacks.get(0);
 		} catch (IndexOutOfBoundsException e) {
@@ -234,6 +290,15 @@ public class ProjectCrumbs extends Application {
 
 		primaryStage.setTitle("Project Crumbs v1.0.0");
 		primaryStage.setScene(loginScreen(primaryStage));
+		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		    @Override
+		    public void handle(WindowEvent t) {
+		        Platform.exit();
+		        System.exit(0);
+		    }
+		});
+		
 		primaryStage.show();
 	}
 }
