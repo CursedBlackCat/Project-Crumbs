@@ -63,7 +63,7 @@ public class ProjectCrumbs extends Application {
 		launch(args);
 	}
 
-	private DiscordApi login(String token) throws Exception {
+	private DiscordApi login(String token) throws LoginException {
 		token = token.replaceAll("\"", "");
 
 		api =  new DiscordApiBuilder().setAccountType(AccountType.CLIENT).setToken(token).login().join();
@@ -127,14 +127,20 @@ public class ProjectCrumbs extends Application {
 					api = login(tokenTextField.getText());
 					new Alert(AlertType.INFORMATION, "Successfully logged in as " + api.getYourself().getDiscriminatedName()).showAndWait();
 					
-					BufferedWriter writer = new BufferedWriter(new FileWriter(token));
+					BufferedWriter writer = new BufferedWriter(new FileWriter(token, false));
 					writer.write(tokenTextField.getText());
 					writer.close();
 					
 					stage.setScene(stickerScene(stage));
-				} catch (Exception e) {
+				} catch (IOException e) {
+					new Alert(AlertType.ERROR, "Couldn't write token to config (IOException). See console for stack trace.").showAndWait();
+					e.printStackTrace();
+				} catch (LoginException e) {
 					new Alert(AlertType.ERROR, "Invalid token.").showAndWait();
 					tokenTextField.setText("");
+				} catch (NullPointerException e) {
+					new Alert(AlertType.ERROR, "Couldn't find image background (NullPointerException). See console for stack trace.").showAndWait();
+					e.printStackTrace();
 				}
 			}
 		});
@@ -259,7 +265,7 @@ public class ProjectCrumbs extends Application {
 			token = new File(configDirectory.getPath() + "\\token.pcdss");
 			token.createNewFile();
 
-			clearImage = new Image(ProjectCrumbs.class.getResource("clear.png").toURI().toString());
+			clearImage = new Image(this.getClass().getResource("clear.png").toURI().toString());
 			
 		} catch (URISyntaxException e) {
 			new Alert(AlertType.ERROR, "Error occurred when loading config: URISyntaxException. See console for stack trace.").showAndWait();
@@ -286,7 +292,7 @@ public class ProjectCrumbs extends Application {
 			System.exit(0);
 		}
 
-		primaryStage.setTitle("Project Crumbs v1.0.0");
+		primaryStage.setTitle("Project Crumbs v1.1.0");
 		primaryStage.setScene(loginScreen(primaryStage));
 		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
