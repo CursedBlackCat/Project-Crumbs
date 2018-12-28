@@ -5,7 +5,7 @@ The Project Crumbs Discord Sticker Sender (PCDSS) is a project by CursedBlackCat
 This program signs in to your Discord user account via the Discord API. Discord officially does not allow selfbots, so this program falls into a grey area in terms of Discord's Terms of Service. The program author will not be held responsible if your Discord account is terminated for using this program. **Use this program at your own risk!!**
 
 ## Getting Started
-Pick up the latest [release](https://github.com/CursedBlackCat/Project-Crumbs/releases) JAR, and save it in a directory that is convenient for you. On first launch, the program will create a folder called `stickers` and warn you that there are no stickers. You can create sticker packs by making folders in the `stickers` folder, and adding images to the folders.
+Pick up the [latest release JAR](https://github.com/CursedBlackCat/Project-Crumbs/releases/latest), and save it in a directory that is convenient for you. On first launch, the program will create a folder called `stickers` and warn you that there are no stickers. You can create sticker packs by making folders in the `stickers` folder, and adding images to the folders.
 
 Please note that the program will not work if you have an empty sticker pack (i.e. an empty folder inside the `stickers` folder that the program created.
 
