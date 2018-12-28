@@ -264,8 +264,7 @@ public class ProjectCrumbs extends Application {
 		} catch (URISyntaxException e) {
 			new Alert(AlertType.ERROR, "Error occurred when loading config: URISyntaxException. See console for stack trace.").showAndWait();
 		} catch (NullPointerException e) {
-			new Alert(AlertType.ERROR, "Error occurred when loading config: NullPointerException. See console for stack trace.").showAndWait();
-			e.printStackTrace();
+			//Config file not found, this will occur on first launch
 		} catch (ArrayIndexOutOfBoundsException e) {
 			new Alert(AlertType.ERROR, "Error occurred when loading config: ArrayIndexOutOfBoundsException. See console for stack trace.").showAndWait();
 			e.printStackTrace();
