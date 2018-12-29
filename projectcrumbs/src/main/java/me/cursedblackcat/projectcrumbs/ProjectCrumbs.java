@@ -13,6 +13,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -149,11 +150,33 @@ public class ProjectCrumbs extends Application {
 	}
 
 	private Scene stickerScene(Stage stage) {
-		GridPane stickerSceneGrid = new GridPane();
-		stickerSceneGrid.setAlignment(Pos.TOP_LEFT);
-		stickerSceneGrid.setHgap(10);
-		stickerSceneGrid.setVgap(10);
-		stickerSceneGrid.setPadding(new Insets(5, 5, 5, 5));
+		GridPane parentGrid = new GridPane();
+		parentGrid.setAlignment(Pos.TOP_LEFT);
+		parentGrid.setHgap(10);
+		parentGrid.setVgap(10);
+		
+		GridPane stickerPackGrid = new GridPane();
+		
+		ScrollPane stickerPackScroll = new ScrollPane();
+		stickerPackScroll.setMinHeight(65);
+		stickerPackScroll.setStyle("-fx-background-color:transparent;");
+		stickerPackScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		stickerPackScroll.setContent(stickerPackGrid);
+		
+		GridPane stickerGrid = new GridPane();
+		stickerGrid.setAlignment(Pos.TOP_LEFT);
+		stickerGrid.setHgap(10);
+		stickerGrid.setVgap(10);
+		stickerGrid.setPadding(new Insets(5, 5, 5, 5));
+		
+		ScrollPane stickerScroll = new ScrollPane();
+		stickerScroll.setFitToWidth(true);
+		stickerScroll.setStyle("-fx-background-color:transparent;");
+		stickerScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		stickerScroll.setContent(stickerGrid);
+		
+		parentGrid.add(stickerPackScroll, 0, 0);
+		parentGrid.add(stickerScroll, 0, 1);
 
 		//Make the top bar a sticker selector
 		HBox stickerPackSelector = new HBox();
@@ -187,7 +210,7 @@ public class ProjectCrumbs extends Application {
 			stickerPackSelector.getChildren().add(btn);
 		}
 
-		stickerSceneGrid.add(stickerPackSelector, 0, 0, 10, 1); //span 10 columns
+		stickerPackGrid.add(stickerPackSelector, 0, 0, 10, 1); //span 10 columns
 
 		//Make a grid of sticker icons, 100x100px each, for the currently active pack
 		int row = 1;
@@ -214,7 +237,7 @@ public class ProjectCrumbs extends Application {
 				}
 			});
 
-			stickerSceneGrid.add(btn, column, row);
+			stickerGrid.add(btn, column, row);
 			column++;
 			if (column > 9) {
 				row++;
@@ -222,7 +245,7 @@ public class ProjectCrumbs extends Application {
 			}
 		}
 
-		return new Scene(stickerSceneGrid, 1100, 500);
+		return new Scene(parentGrid, 1100, 500);
 	}
 
 	private void loadStickerPacks() {
@@ -293,7 +316,8 @@ public class ProjectCrumbs extends Application {
 		}
 
 		primaryStage.setTitle("Project Crumbs v1.1.0");
-		primaryStage.setScene(loginScreen(primaryStage));
+		//primaryStage.setScene(loginScreen(primaryStage));
+		primaryStage.setScene(stickerScene(primaryStage));
 		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		    @Override
