@@ -315,9 +315,8 @@ public class ProjectCrumbs extends Application {
 			System.exit(0);
 		}
 
-		primaryStage.setTitle("Project Crumbs v1.1.0");
-		//primaryStage.setScene(loginScreen(primaryStage));
-		primaryStage.setScene(stickerScene(primaryStage));
+		primaryStage.setTitle("Project Crumbs v1.2.0");
+		primaryStage.setScene(loginScreen(primaryStage));
 		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		    @Override
